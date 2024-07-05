@@ -55,6 +55,32 @@
             margin-top: 20px;
             color: #fff;
         }
+        .categories {
+            display: flex;
+            justify-content: space-between;
+        }
+        .category {
+            flex: 1;
+            padding: 5px;
+            margin: 5px;
+            background-color: rgba(0,0,0,0.5);
+            border-radius: 5px;
+            text-align: center;
+        }
+        .category-bar {
+            height: 20px;
+            background-color: green;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+        .noob, .beginner, .intermediate, .advanced, .elite, .freak {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .category-label {
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
     </style>
 </head>
 <body>
@@ -102,9 +128,24 @@
         <button onclick="submitData()">Submit</button>
 
         <div class="results">
-            <p>SQUAT Category: <span id="squat_category"></span></p>
-            <p>BENCH Category: <span id="bench_category"></span></p>
-            <p>DEADLIFT Category: <span id="deadlift_category"></span></p>
+            <div>
+                <p>SQUAT Category: <span id="squat_category"></span></p>
+                <div class="categories" id="squat_categories">
+                    <!-- Category columns for Squat will be added here dynamically -->
+                </div>
+            </div>
+            <div>
+                <p>BENCH Category: <span id="bench_category"></span></p>
+                <div class="categories" id="bench_categories">
+                    <!-- Category columns for Bench will be added here dynamically -->
+                </div>
+            </div>
+            <div>
+                <p>DEADLIFT Category: <span id="deadlift_category"></span></p>
+                <div class="categories" id="deadlift_categories">
+                    <!-- Category columns for Deadlift will be added here dynamically -->
+                </div>
+            </div>
         </div>
     </div>
 
@@ -118,7 +159,7 @@
             const bench = document.getElementById('bench').value;
             const deadlift = document.getElementById('deadlift').value;
 
-	    const apiUrl = 'API_GATEWAY_URL_PLACEHOLDER';
+            const apiUrl = 'API_GATEWAY_URL_PLACEHOLDER';
 
             console.log('Submitting data:', {
                 username: username,
@@ -158,12 +199,44 @@
                     document.getElementById('squat_category').innerText = data.body.Squat || 'N/A';
                     document.getElementById('bench_category').innerText = data.body.Bench || 'N/A';
                     document.getElementById('deadlift_category').innerText = data.body.Deadlift || 'N/A';
+
+                    updateCategoryBars('squat', data.body.Squat_Percentage, data.body.Squat);
+                    updateCategoryBars('bench', data.body.Bench_Percentage, data.body.Bench);
+                    updateCategoryBars('deadlift', data.body.Deadlift_Percentage, data.body.Deadlift);
                 } else {
                     console.error('Response body is undefined:', data);
                 }
             } catch (error) {
                 console.error('Error:', error);
             }
+        }
+
+        function updateCategoryBars(lift, percentage, category) {
+            const categories = ['noob', 'beginner', 'intermediate', 'advanced', 'elite', 'freak'];
+            const container = document.getElementById(`${lift}_categories`);
+
+            container.innerHTML = '';  // Clear existing bars
+
+            categories.forEach(cat => {
+                const barContainer = document.createElement('div');
+                barContainer.classList.add('category');
+                const bar = document.createElement('div');
+                bar.classList.add('category-bar');
+                const label = document.createElement('div');
+                label.classList.add('category-label');
+                label.innerText = cat.charAt(0).toUpperCase() + cat.slice(1);
+
+                if (cat === category.toLowerCase()) {
+                    bar.style.width = `${percentage}%`;
+                    bar.innerText = `${percentage}%`;
+                } else if (categories.indexOf(cat) < categories.indexOf(category.toLowerCase())) {
+                    bar.style.width = '100%';
+                }
+
+                barContainer.appendChild(label);
+                barContainer.appendChild(bar);
+                container.appendChild(barContainer);
+            });
         }
     </script>
 

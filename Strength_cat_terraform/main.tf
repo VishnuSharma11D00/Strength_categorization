@@ -61,7 +61,7 @@ module "aws_amplify" {
   git_repo = local.git_repo
   github_access_token = local.github_access_token
   app_name = local.app_name
-  API_GATEWAY_URL_root = "https://1snmktl5ui.execute-api.us-east-1.amazonaws.com/dev/root"     # module.api-gateway.root_url (api-gateway cors did not work through terraform)
+  API_GATEWAY_URL_root = local.api_gateway_stage_url     # module.api-gateway.root_url (api-gateway cors did not work through terraform)
   
   # depends_on = [ module.api-gateway ]
 }

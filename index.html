@@ -159,7 +159,7 @@
             const bench = document.getElementById('bench').value;
             const deadlift = document.getElementById('deadlift').value;
 
-            const apiUrl = 'https://xsneaakzsf.execute-api.us-east-1.amazonaws.com/dev/root';
+            const apiUrl = 'API_GATEWAY_URL_PLACEHOLDER';
 
             console.log('Submitting data:', {
                 username: username,
@@ -217,6 +217,8 @@
 
             container.innerHTML = '';  // Clear existing bars
 
+            let color = true; // Boolean to control coloring of bars
+
             categories.forEach(cat => {
                 const barContainer = document.createElement('div');
                 barContainer.classList.add('category');
@@ -226,11 +228,16 @@
                 label.classList.add('category-label');
                 label.innerText = cat.charAt(0).toUpperCase() + cat.slice(1);
 
-                if (cat === category.toLowerCase()) {
-                    bar.style.width = `${percentage}%`;
-                    bar.innerText = `${percentage}%`;
-                } else if (categories.indexOf(cat) < categories.indexOf(category.toLowerCase())) {
-                    bar.style.width = '100%';
+                if (color) {
+                    if (cat === category.toLowerCase()) {
+                        bar.style.width = `${percentage}%`;
+                        bar.innerText = `${percentage}%`;
+                        color = false; // Stop coloring after the calculated category
+                    } else {
+                        bar.style.width = '100%';
+                    }
+                } else {
+                    bar.style.backgroundColor = 'transparent'; // Uncolor the bar
                 }
 
                 barContainer.appendChild(label);

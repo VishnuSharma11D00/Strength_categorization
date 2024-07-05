@@ -37,5 +37,6 @@ locals {
   git_repo = "----------------------------------------------------------------"      # your git repo
   github_access_token = "-----------------------------------------------------"      # your git hub access token
   app_name = "strength_cat"                                                          # name of your app
-  api_gateway_stage_url = "https://------------------------"                         # api gateway stage url path /history
+  api_gateway_stage_url = "https://------------------------"                         # api gateway stage url path /root
+  api_gateway_stage_url_history = "https://------------------------"                 # api gateway stage url path /history
 }

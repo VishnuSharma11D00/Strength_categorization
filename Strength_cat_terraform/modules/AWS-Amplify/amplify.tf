@@ -15,6 +15,7 @@ resource "aws_amplify_app" "example" {
 
   environment_variables = {
     API_GATEWAY_URL_root = var.API_GATEWAY_URL_root
+    API_GATEWAY_URL_history = var.API_GATEWAY_URL_history
   }
 }
 

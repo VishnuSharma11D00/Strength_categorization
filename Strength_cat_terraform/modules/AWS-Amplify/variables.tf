@@ -14,7 +14,7 @@ variable "API_GATEWAY_URL_root" {
   description = "root stage url for the api gateway"
 }
 
-/*
+
 variable "API_GATEWAY_URL_history" {
   description = "stage url for the api gateway path-history"
-} */
+} 

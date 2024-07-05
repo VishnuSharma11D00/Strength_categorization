@@ -126,6 +126,7 @@
         </div>
 
         <button onclick="submitData()">Submit</button>
+        <button onclick="viewHistory()">View History</button>
 
         <div class="results">
             <div>
@@ -150,6 +151,8 @@
     </div>
 
     <script>
+        const apiUrl = 'API_GATEWAY_URL_PLACEHOLDER'; // Replace with your environment variable
+
         async function submitData() {
             const username = document.getElementById('username').value;
             const bodyweight = document.getElementById('bodyweight').value;
@@ -158,8 +161,6 @@
             const squat = document.getElementById('squat').value;
             const bench = document.getElementById('bench').value;
             const deadlift = document.getElementById('deadlift').value;
-
-            const apiUrl = 'API_GATEWAY_URL_PLACEHOLDER';
 
             console.log('Submitting data:', {
                 username: username,
@@ -209,6 +210,11 @@
             } catch (error) {
                 console.error('Error:', error);
             }
+        }
+
+        function viewHistory() {
+            const username = document.getElementById('username').value;
+            window.location.href = `History.html?username=${encodeURIComponent(username)}`;
         }
 
         function updateCategoryBars(lift, percentage, category) {

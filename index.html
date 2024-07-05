@@ -55,31 +55,30 @@
             margin-top: 20px;
             color: #fff;
         }
-        .categories {
+        .category-container {
             display: flex;
-            justify-content: space-between;
+            margin-top: 10px;
         }
         .category {
             flex: 1;
-            padding: 5px;
-            margin: 5px;
-            background-color: rgba(0,0,0,0.5);
-            border-radius: 5px;
+            background-color: rgba(255,255,255,0.3);
+            margin: 0 5px;
+            padding: 10px;
             text-align: center;
+            position: relative;
         }
-        .category-bar {
-            height: 20px;
+        .filled {
             background-color: green;
-            border-radius: 5px;
-            margin-top: 5px;
+            color: white;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
         }
-        .noob, .beginner, .intermediate, .advanced, .elite, .freak {
-            width: 100%;
-            margin-bottom: 10px;
-        }
-        .category-label {
-            margin-top: 5px;
-            margin-bottom: 5px;
+        .percentage {
+            position: absolute;
+            right: 5px;
+            bottom: 5px;
         }
     </style>
 </head>
@@ -128,23 +127,29 @@
         <button onclick="submitData()">Submit</button>
 
         <div class="results">
-            <div>
-                <p>SQUAT Category: <span id="squat_category"></span></p>
-                <div class="categories" id="squat_categories">
-                    <!-- Category columns for Squat will be added here dynamically -->
-                </div>
+            <div class="category-container" id="squat_results">
+                <div class="category" id="squat_noob">Noob</div>
+                <div class="category" id="squat_beginner">Beginner</div>
+                <div class="category" id="squat_intermediate">Intermediate</div>
+                <div class="category" id="squat_advanced">Advanced</div>
+                <div class="category" id="squat_elite">Elite</div>
+                <div class="category" id="squat_freak">Freak</div>
             </div>
-            <div>
-                <p>BENCH Category: <span id="bench_category"></span></p>
-                <div class="categories" id="bench_categories">
-                    <!-- Category columns for Bench will be added here dynamically -->
-                </div>
+            <div class="category-container" id="bench_results">
+                <div class="category" id="bench_noob">Noob</div>
+                <div class="category" id="bench_beginner">Beginner</div>
+                <div class="category" id="bench_intermediate">Intermediate</div>
+                <div class="category" id="bench_advanced">Advanced</div>
+                <div class="category" id="bench_elite">Elite</div>
+                <div class="category" id="bench_freak">Freak</div>
             </div>
-            <div>
-                <p>DEADLIFT Category: <span id="deadlift_category"></span></p>
-                <div class="categories" id="deadlift_categories">
-                    <!-- Category columns for Deadlift will be added here dynamically -->
-                </div>
+            <div class="category-container" id="deadlift_results">
+                <div class="category" id="deadlift_noob">Noob</div>
+                <div class="category" id="deadlift_beginner">Beginner</div>
+                <div class="category" id="deadlift_intermediate">Intermediate</div>
+                <div class="category" id="deadlift_advanced">Advanced</div>
+                <div class="category" id="deadlift_elite">Elite</div>
+                <div class="category" id="deadlift_freak">Freak</div>
             </div>
         </div>
     </div>
@@ -160,16 +165,6 @@
             const deadlift = document.getElementById('deadlift').value;
 
             const apiUrl = 'API_GATEWAY_URL_PLACEHOLDER';
-
-            console.log('Submitting data:', {
-                username: username,
-                gender: gender,
-                bw: bodyweight,
-                squat: squat,
-                bench: bench,
-                deadlift: deadlift,
-                unit: unit
-            });
 
             try {
                 const response = await fetch(apiUrl, {
@@ -193,16 +188,11 @@
                 }
 
                 const data = await response.json();
-                console.log('Response data:', data);
 
                 if (data.body) {
-                    document.getElementById('squat_category').innerText = data.body.Squat || 'N/A';
-                    document.getElementById('bench_category').innerText = data.body.Bench || 'N/A';
-                    document.getElementById('deadlift_category').innerText = data.body.Deadlift || 'N/A';
-
-                    updateCategoryBars('squat', data.body.Squat_Percentage, data.body.Squat);
-                    updateCategoryBars('bench', data.body.Bench_Percentage, data.body.Bench);
-                    updateCategoryBars('deadlift', data.body.Deadlift_Percentage, data.body.Deadlift);
+                    updateCategory('squat', data.body.Squat, data.body.Squat_Percentage);
+                    updateCategory('bench', data.body.Bench, data.body.Bench_Percentage);
+                    updateCategory('deadlift', data.body.Deadlift, data.body.Deadlift_Percentage);
                 } else {
                     console.error('Response body is undefined:', data);
                 }
@@ -211,32 +201,30 @@
             }
         }
 
-        function updateCategoryBars(lift, percentage, category) {
+        function updateCategory(lift, category, percentage) {
             const categories = ['noob', 'beginner', 'intermediate', 'advanced', 'elite', 'freak'];
-            const container = document.getElementById(`${lift}_categories`);
+            let filled = false;
+            for (let i = 0; i < categories.length; i++) {
+                const elem = document.getElementById(`${lift}_${categories[i]}`);
+                elem.style.backgroundColor = '';
+                elem.innerHTML = categories[i].charAt(0).toUpperCase() + categories[i].slice(1);
+            }
 
-            container.innerHTML = '';  // Clear existing bars
-
-            categories.forEach(cat => {
-                const barContainer = document.createElement('div');
-                barContainer.classList.add('category');
-                const bar = document.createElement('div');
-                bar.classList.add('category-bar');
-                const label = document.createElement('div');
-                label.classList.add('category-label');
-                label.innerText = cat.charAt(0).toUpperCase() + cat.slice(1);
-
-                if (cat === category.toLowerCase()) {
-                    bar.style.width = `${percentage}%`;
-                    bar.innerText = `${percentage}%`;
-                } else if (categories.indexOf(cat) < categories.indexOf(category.toLowerCase())) {
-                    bar.style.width = '100%';
+            for (let i = 0; i < categories.length; i++) {
+                const elem = document.getElementById(`${lift}_${categories[i]}`);
+                if (filled) {
+                    elem.style.backgroundColor = '';
+                } else {
+                    elem.style.backgroundColor = 'green';
+                    if (categories[i] === category.toLowerCase()) {
+                        filled = true;
+                        elem.style.backgroundImage = `linear-gradient(to top, green ${percentage}%, transparent ${percentage}%)`;
+                        elem.innerHTML = `<div>${categories[i].charAt(0).toUpperCase() + categories[i].slice(1)}</div><div class="percentage">${percentage}%</div>`;
+                    } else {
+                        elem.innerHTML = categories[i].charAt(0).toUpperCase() + categories[i].slice(1);
+                    }
                 }
-
-                barContainer.appendChild(label);
-                barContainer.appendChild(bar);
-                container.appendChild(barContainer);
-            });
+            }
         }
     </script>
 

@@ -3,182 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>History</title>
+    <title>Fetch History</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: url('background.jpg') no-repeat center center fixed;
-            background-size: cover;
-            color: #fff;
-            text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
-        }
-        h1 {
-            background-color: rgba(0,0,0,0.7);
-            color: #fff;
-            padding: 20px 0;
-            margin: 0;
-            text-align: center;
-        }
-        .container {
-            padding: 20px;
-            background-color: rgba(0,0,0,0.5);
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-            margin: 20px auto;
-            width: 90%;
-            max-width: 1200px;
-        }
-        input[type="text"], input[type="number"], select {
-            width: 200px;
-            padding: 10px;
-            margin: 10px;
-            border: none;
-            border-radius: 5px;
-            background-color: rgba(255,255,255,0.7);
-            color: #333;
-        }
-        button {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
         }
+
         th, td {
-            padding: 10px;
+            border: 1px solid black;
+            padding: 8px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
         }
+
         th {
-            background-color: rgba(0,0,0,0.7);
+            background-color: #f2f2f2;
         }
-        .percentage {
+
+        .percentage-bar {
             height: 20px;
             background-color: green;
-            border-radius: 5px;
-        }
-        .percentage-text {
-            color: white;
             text-align: center;
+            color: white;
         }
     </style>
 </head>
 <body>
-    <h1>Submission History</h1>
-
-    <div class="container">
-        <form id="usernameForm">
-            <label for="usernameInput">Username:</label>
-            <input type="text" id="usernameInput" required>
-            <button type="submit">Fetch History</button>
-        </form>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Username</th>
-                    <th>Gender</th>
-                    <th>Timestamp</th>
-                    <th>Squat</th>
-                    <th>Squat Category</th>
-                    <th>Squat Percentage</th>
-                    <th>Bench</th>
-                    <th>Bench Category</th>
-                    <th>Bench Percentage</th>
-                    <th>Deadlift</th>
-                    <th>Deadlift Category</th>
-                    <th>Deadlift Percentage</th>
-                </tr>
-            </thead>
-            <tbody id="historyTableBody">
-                <!-- Table rows will be added dynamically -->
-            </tbody>
-        </table>
-    </div>
-
+    <h2>Fetch User History</h2>
+    <input type="text" id="username" placeholder="Enter username">
+    <button onclick="fetchHistory()">Submit</button>
+    <br><br>
+    <table id="resultTable">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Gender</th>
+                <th>Timestamp</th>
+                <th>Squat</th>
+                <th>Squat Category</th>
+                <th>Squat Percentage</th>
+                <th>Bench</th>
+                <th>Bench Category</th>
+                <th>Bench Percentage</th>
+                <th>Deadlift</th>
+                <th>Deadlift Category</th>
+                <th>Deadlift Percentage</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data rows will be added here dynamically -->
+        </tbody>
+    </table>
     <script>
-        const apiUrl = 'API_GATEWAY_URL_PLACEHOLDER';
+        const api_url = "API_GATEWAY_URL_PLACEHOLDER";
+        
+        async function fetchHistory() {
+            const username = document.getElementById('username').value;
+            if (!username) {
+                alert('Please enter a username');
+                return;
+            }
 
-        document.getElementById('usernameForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const username = document.getElementById('usernameInput').value;
-            fetchData(username);
-        });
-
-        async function fetchData(username) {
             try {
-                const url = `${apiUrl}?username=${encodeURIComponent(username)}`;
-                const response = await fetch(url);
-
+                const response = await fetch(`${api_url}?username=${username}`);
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
+                const data = await response.json();
+                console.log("Data fetched:", data); // Debugging line
 
-                const responseBody = await response.json();
-
-                // Ensure data is an array before populating the table
-                if (Array.isArray(responseBody)) {
-                    populateTable(responseBody);
-                } else {
-                    alert('Invalid data format received from server');
+                // Parse the JSON string from the body if necessary
+                let parsedData;
+                try {
+                    parsedData = JSON.parse(data.body);
+                } catch (e) {
+                    parsedData = data;
                 }
+                
+                displayData(parsedData);
             } catch (error) {
-                alert('Error fetching data');
+                alert(`Error fetching data: ${error}`);
+                console.error("Fetch error:", error); // Debugging line
             }
         }
 
-        function populateTable(data) {
-            const tableBody = document.getElementById('historyTableBody');
-            tableBody.innerHTML = '';
-            data.forEach(item => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${item.username || 'N/A'}</td>
-                    <td>${item.gender || 'N/A'}</td>
-                    <td>${new Date(item.timestamp).toLocaleString()}</td>
-                    <td>${item.squat || 'N/A'}</td>
-                    <td>${item.squat_category || 'N/A'}</td>
-                    <td>
-                        <div class="percentage" style="width: ${item.squat_percentage || 0}%;"></div>
-                        <div class="percentage-text">${(item.squat_percentage || 0).toFixed(2)}%</div>
-                    </td>
-                    <td>${item.bench || 'N/A'}</td>
-                    <td>${item.bench_category || 'N/A'}</td>
-                    <td>
-                        <div class="percentage" style="width: ${item.bench_percentage || 0}%;"></div>
-                        <div class="percentage-text">${(item.bench_percentage || 0).toFixed(2)}%</div>
-                    </td>
-                    <td>${item.deadlift || 'N/A'}</td>
-                    <td>${item.deadlift_category || 'N/A'}</td>
-                    <td>
-                        <div class="percentage" style="width: ${item.deadlift_percentage || 0}%;"></div>
-                        <div class="percentage-text">${(item.deadlift_percentage || 0).toFixed(2)}%</div>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
-        }
+        function displayData(data) {
+            const tbody = document.getElementById('resultTable').getElementsByTagName('tbody')[0];
+            tbody.innerHTML = ''; // Clear existing rows
 
-        window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const username = urlParams.get('username');
-            if (username) {
-                document.getElementById('usernameInput').value = username;
-                fetchData(username);
+            if (Array.isArray(data)) {
+                data.forEach(item => {
+                    const row = tbody.insertRow();
+
+                    row.insertCell().textContent = item.username || 'N/A';
+                    row.insertCell().textContent = item.gender || 'N/A';
+                    row.insertCell().textContent = item.timestamp || 'N/A';
+                    row.insertCell().textContent = item.squat || 'N/A';
+                    row.insertCell().textContent = item.squat_category || 'N/A';
+
+                    const squatPercentageCell = row.insertCell();
+                    const squatPercentageBar = document.createElement('div');
+                    squatPercentageBar.className = 'percentage-bar';
+                    squatPercentageBar.style.width = (item.squat_percentage || 0) + '%';
+                    squatPercentageBar.textContent = (item.squat_percentage || 0) + '%';
+                    squatPercentageCell.appendChild(squatPercentageBar);
+
+                    row.insertCell().textContent = item.bench || 'N/A';
+                    row.insertCell().textContent = item.bench_category || 'N/A';
+
+                    const benchPercentageCell = row.insertCell();
+                    const benchPercentageBar = document.createElement('div');
+                    benchPercentageBar.className = 'percentage-bar';
+                    benchPercentageBar.style.width = (item.bench_percentage || 0) + '%';
+                    benchPercentageBar.textContent = (item.bench_percentage || 0) + '%';
+                    benchPercentageCell.appendChild(benchPercentageBar);
+
+                    row.insertCell().textContent = item.deadlift || 'N/A';
+                    row.insertCell().textContent = item.deadlift_category || 'N/A';
+
+                    const deadliftPercentageCell = row.insertCell();
+                    const deadliftPercentageBar = document.createElement('div');
+                    deadliftPercentageBar.className = 'percentage-bar';
+                    deadliftPercentageBar.style.width = (item.deadlift_percentage || 0) + '%';
+                    deadliftPercentageBar.textContent = (item.deadlift_percentage || 0) + '%';
+                    deadliftPercentageCell.appendChild(deadliftPercentageBar);
+                });
+            } else {
+                alert('Invalid data format received from server');
+                console.error("Invalid data format:", data); // Debugging line
             }
-        };
+        }
     </script>
 </body>
 </html>

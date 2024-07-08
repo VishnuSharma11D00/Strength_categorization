@@ -1,4 +1,4 @@
-# Strength Level Categorization Web Application - API Gateway, LAmbda, DynamoDB 
+# Strength Level Categorization Web Application - API Gateway, Lambda, DynamoDB 
 
 This web application categorizes your strength level from NOOB to FREAK based on your squat, bench press, and deadlift strengths, tailored according to your gender. It also provides an option to retrieve the history of all your previous results and data.
 

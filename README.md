@@ -62,6 +62,15 @@ The application is hosted on AWS with the following components:
            - Add GET method.
            - Integrate with History_lambda.
            - Enable CORS: Add headers (Access-Control-Allow-Origin: '*', Access-Control-Allow-Methods: GET).
+           - In the Method Request section, add a query string parameter named 'username' and mark it as 'required'.
+           - In the Integration Request section, configure the mapping template to pass the username parameter to the Lambda function. Add the following mapping template for 'application/json':
+             ```sh
+             {
+               "queryStringParameters": {
+                 "username": "$input.params('username')"
+               }
+             }
+             ```
         4. Deploy API:
            - Deploy API to a stage (e.g., dev).
       - Now, uncomment amplify module. Copy the Stage url of root/POST and history/GET, and past it in the variables in local.tf; api_gateway_stage_url and api_gateway_stage_url_history. Apply Terraform commands
@@ -74,7 +83,7 @@ The application is hosted on AWS with the following components:
 4. **Connect AWS Amplify to GitHub**:
     - Navigate to the AWS Amplify Console.
     - Connect the Amplify app to your GitHub repository.
-    - Deploy the frontend from the `main` branch.
+    - Deploy the frontend from the `main` branch by clicking on Deployments -> ```Run job```
 
 5. **Access the Application**:
     - The application should now be accessible via the AWS Amplify domain.
